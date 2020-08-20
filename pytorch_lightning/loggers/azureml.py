@@ -1,14 +1,11 @@
-
-# TODO: see tidbit's copy.
-
-
 from argparse import Namespace
 from typing import Optional, Dict, Union, Any
 
 try:
-    # TODO: azure ml imports.
     from azureml.core import Run as AzureMlRun
+    from azureml.core.run import _OfflineRun as AzureMlOfflineRun
 except ImportError:  # pragma: no-cover
+    AzureMlOfflineRun = None
     AzureMlRun = None
     _AZURE_ML_AVAILABLE = False
 else:
@@ -91,4 +88,7 @@ class AzureMlLogger(LightningLoggerBase):
 
         https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.run.run?view=azure-ml-py#number
         """
-        return str(self.experiment.number)
+        if isinstance(self.experiment, AzureMlOfflineRun):
+            return '0'
+        else:
+            return str(self.experiment.number)
