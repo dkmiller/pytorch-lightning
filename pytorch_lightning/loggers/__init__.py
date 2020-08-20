@@ -12,6 +12,13 @@ __all__ = [
 ]
 
 try:
+    from pytorch_lightning.loggers.azureml import AzureMlLogger
+except ImportError:  # pragma: no-cover
+    pass  # pragma: no-cover
+else:
+    __all__.append('AzureMlLogger')
+
+try:
     # needed to prevent ImportError and duplicated logs.
     environ["COMET_DISABLE_AUTO_LOGGING"] = "1"
 
