@@ -50,10 +50,21 @@ class AzureMlLogger(LightningLoggerBase):
 
         pip install azureml-sdk
 
-    Azure Machine Learning requires ???.
+    The Azure Machine Learning logger will log to standard output if running in
+    offline mode, or to
+    `Azure Machine Learning metrics <https://docs.microsoft.com/en-us/azure/machine-learning/how-to-track-experiments>`_
+    if running remotely.
+
+    Example:
+        >>> from azureml.core import Run
+        >>> from pytorch_lightning.loggers import AzureMlLogger
+        >>> run = Run.get_context()
+        >>> azureml_logger = AzureMlLogger(run)
+        >>> trainer = Trainer(max_epochs=10, logger=azureml_logger)
 
     Args:
-        run: ?
+        run: Optionally inject Azure Machine Learning ``Run`` object directly.
+            If this is not provided, default to ``Run.get_context()``.
     """
 
     def __init__(self, run: Optional[AzureMlRun] = None):
@@ -86,6 +97,10 @@ class AzureMlLogger(LightningLoggerBase):
 
     @rank_zero_only
     def log_hyperparams(self, params: Union[Dict[str, Any], Namespace]) -> None:
+        """
+        Tags the underlying Azure Machine Learning run with the given
+        hyperparameters.
+        """
         params = self._convert_params(params)
         params = self._flatten_dict(params)
         for name, value in params.items():
